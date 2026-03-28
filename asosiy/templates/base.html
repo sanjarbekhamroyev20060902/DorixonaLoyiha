@@ -1,0 +1,340 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SHIFO-NUR | Online Dorixona{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #198754;
+            --primary-dark: #146c43;
+            --light-bg: #f8faf9;
+            --card-radius: 18px;
+            --shadow-sm: 0 6px 18px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.10);
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            background: var(--light-bg);
+            font-family: Arial, Helvetica, sans-serif;
+            color: #1f2937;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        .navbar-custom {
+            background: linear-gradient(135deg, #198754, #157347);
+            box-shadow: 0 8px 24px rgba(25, 135, 84, 0.18);
+        }
+
+        .brand-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+
+        .brand-logo i {
+            font-size: 1.4rem;
+        }
+
+        .search-form .form-control {
+            border: none;
+            border-radius: 999px;
+            padding: 0.75rem 1rem;
+            box-shadow: none;
+        }
+
+        .search-form .form-control:focus {
+            box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.25);
+        }
+
+        .search-form .btn {
+            border-radius: 999px;
+            padding: 0.75rem 1rem;
+        }
+
+        .nav-btn {
+            border-radius: 12px;
+            font-weight: 600;
+            padding: 0.65rem 0.95rem;
+            transition: 0.25s ease;
+            white-space: nowrap;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .icon-btn {
+            width: 46px;
+            height: 46px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .content-wrapper {
+            margin-top: 28px;
+            margin-bottom: 40px;
+        }
+
+        .alert {
+            border: none;
+            border-radius: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-card {
+            background: #fff;
+            border-radius: var(--card-radius);
+            box-shadow: var(--shadow-sm);
+        }
+
+        footer {
+            margin-top: auto;
+            background: #111827;
+        }
+
+        .footer-title {
+            color: #22c55e;
+            font-weight: 700;
+        }
+
+        .footer-link {
+            color: #d1d5db;
+            text-decoration: none;
+            transition: 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: #ffffff;
+        }
+
+        .footer-muted {
+            color: #9ca3af;
+        }
+
+        .badge-counter {
+            font-size: 0.70rem;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-label-btn {
+            position: relative;
+        }
+
+        .search-wrapper {
+            flex: 1;
+            max-width: 560px;
+        }
+
+        @media (max-width: 991px) {
+            .search-form {
+                width: 100% !important;
+            }
+
+            .search-wrapper {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .navbar-actions {
+                width: 100%;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+                margin-top: 12px;
+            }
+        }
+
+        @media (max-width: 575px) {
+            .brand-logo {
+                font-size: 1.25rem;
+            }
+
+            .nav-btn {
+                padding: 0.6rem 0.85rem;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top py-3">
+        <div class="container">
+
+            <a class="navbar-brand brand-logo" href="{% url 'home' %}">
+                <i class="fas fa-clinic-medical me-2"></i>SHIFO-NUR
+            </a>
+
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+
+                <div class="search-wrapper mx-auto my-3 my-lg-0">
+                    <form class="search-form d-flex w-100" action="{% url 'home' %}" method="get">
+                        <input class="form-control me-2"
+                               type="search"
+                               name="q"
+                               placeholder="Dori nomini qidiring..."
+                               value="{{ request.GET.q|default:'' }}">
+                        <button class="btn btn-light text-success fw-semibold" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 navbar-actions">
+                    {% if user.is_authenticated %}
+
+                        <a href="{% url 'wishlist' %}" class="btn btn-outline-light nav-btn icon-btn" title="Saralanganlar">
+                            <i class="fas fa-heart"></i>
+                        </a>
+
+                        <a href="{% url 'compare_products' %}" class="btn btn-outline-light nav-btn icon-btn position-relative" title="Solishtirish">
+                            <i class="fas fa-scale-balanced"></i>
+                            {% if compare_soni > 0 %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark badge-counter">
+                                    {{ compare_soni }}
+                                </span>
+                            {% endif %}
+                        </a>
+
+                        <a href="{% url 'cart' %}" class="btn btn-light text-success nav-btn nav-label-btn position-relative fw-bold" title="Savatcha">
+                            <i class="fas fa-shopping-cart me-1"></i> Savat
+                            {% if savat_soni > 0 %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger badge-counter">
+                                    {{ savat_soni }}
+                                </span>
+                            {% endif %}
+                        </a>
+                        <a href="{% url 'symptom_checker' %}" class="btn btn-outline-light nav-btn">
+                            <i class="fas fa-stethoscope me-1"></i> Simptom AI
+                        </a>
+                        <a href="{% url 'profile' %}" class="btn btn-outline-light nav-btn">
+                            <i class="fas fa-user me-1"></i> Profil
+                        </a>
+
+                        <form action="{% url 'logout' %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button class="btn btn-danger nav-btn" title="Chiqish">
+                                <i class="fas fa-sign-out-alt me-1"></i> Chiqish
+                            </button>
+                        </form>
+
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-light text-success nav-btn fw-bold">Kirish</a>
+                        <a href="{% url 'register' %}" class="btn btn-outline-light nav-btn">Ro'yxatdan o'tish</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container main-content content-wrapper">
+
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                        {% if message.tags == 'success' %}
+                            <i class="fas fa-check-circle me-2"></i>
+                        {% elif message.tags == 'error' %}
+                            <i class="fas fa-circle-exclamation me-2"></i>
+                        {% elif message.tags == 'warning' %}
+                            <i class="fas fa-triangle-exclamation me-2"></i>
+                        {% else %}
+                            <i class="fas fa-circle-info me-2"></i>
+                        {% endif %}
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="text-white pt-5 pb-3">
+        <div class="container">
+            <div class="row g-4">
+
+                <div class="col-md-4">
+                    <h5 class="footer-title mb-3">SHIFO-NUR</h5>
+                    <p class="footer-muted mb-0">
+                        Sizning ishonchli onlayn dorixonangiz. Sifatli mahsulotlar, qulay buyurtma va tezkor xizmat.
+                    </p>
+                </div>
+
+                <div class="col-md-4">
+                    <h6 class="mb-3">Tezkor havolalar</h6>
+                    <ul class="list-unstyled d-flex flex-column gap-2">
+                        <li><a href="{% url 'home' %}" class="footer-link">Bosh sahifa</a></li>
+                        <li><a href="{% url 'cart' %}" class="footer-link">Savatcha</a></li>
+                        <li><a href="{% url 'wishlist' %}" class="footer-link">Saralanganlar</a></li>
+                        <li><a href="{% url 'compare_products' %}" class="footer-link">Solishtirish</a></li>
+                        <li><a href="{% url 'profile' %}" class="footer-link">Profil</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-md-4">
+                    <h6 class="mb-3">Aloqa</h6>
+                    <p class="footer-muted mb-2">
+                        <i class="fas fa-phone me-2"></i> +998 71 123 45 67
+                    </p>
+                    <p class="footer-muted mb-2">
+                        <i class="fas fa-location-dot me-2"></i> Toshkent sh., Chilonzor
+                    </p>
+                    <p class="footer-muted mb-0">
+                        <i class="fas fa-clock me-2"></i> Har kuni: 08:00 - 22:00
+                    </p>
+                </div>
+
+            </div>
+
+            <hr class="border-secondary my-4">
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+                <p class="mb-0 footer-muted">
+                    &copy; 2026 SHIFO-NUR. Barcha huquqlar himoyalangan.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="#" class="footer-link"><i class="fab fa-telegram"></i></a>
+                    <a href="#" class="footer-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="footer-link"><i class="fab fa-facebook"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

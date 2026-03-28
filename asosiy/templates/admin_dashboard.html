@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard | SHIFO-NUR{% endblock %}
+
+{% block extra_css %}
+<style>
+.dashboard-card,
+.dashboard-table-card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.07);
+    overflow: hidden;
+    background: #fff;
+}
+
+.metric-card {
+    border: none;
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    height: 100%;
+}
+
+.metric-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: rgba(25,135,84,0.12);
+    color: #198754;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+}
+
+.section-title {
+    font-weight: 800;
+    color: #1f2937;
+}
+
+.low-stock-badge {
+    background: rgba(220,53,69,0.12);
+    color: #dc3545;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.good-badge {
+    background: rgba(25,135,84,0.12);
+    color: #198754;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="section-title mb-1">
+        <i class="fas fa-chart-line me-2 text-success"></i>Admin Dashboard
+    </h2>
+    <p class="text-muted mb-0">
+        Loyihaning asosiy statistikasi va holati
+    </p>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4 col-xl-3">
+        <div class="card metric-card">
+            <div class="card-body d-flex align-items-center gap-3 p-4">
+                <div class="metric-icon"><i class="fas fa-capsules"></i></div>
+                <div>
+                    <div class="text-muted small">Jami mahsulotlar</div>
+                    <div class="fs-3 fw-bold">{{ jami_mahsulotlar }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+   <div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card dashboard-table-card">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h5 class="fw-bold mb-0">Oxirgi 7 kunlik buyurtmalar</h5>
+            </div>
+            <div class="card-body px-4 pb-4">
+                <canvas id="ordersChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card dashboard-table-card">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h5 class="fw-bold mb-0">Oxirgi 7 kunlik tushum</h5>
+            </div>
+            <div class="card-body px-4 pb-4">
+                <canvas id="revenueChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="col-md-4 col-xl-3">
+        <div class="card metric-card">
+            <div class="card-body d-flex align-items-center gap-3 p-4">
+                <div class="metric-icon"><i class="fas fa-box"></i></div>
+                <div>
+                    <div class="text-muted small">Jami buyurtmalar</div>
+                    <div class="fs-3 fw-bold">{{ jami_buyurtmalar }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-xl-3">
+        <div class="card metric-card">
+            <div class="card-body d-flex align-items-center gap-3 p-4">
+                <div class="metric-icon"><i class="fas fa-users"></i></div>
+                <div>
+                    <div class="text-muted small">Foydalanuvchilar</div>
+                    <div class="fs-3 fw-bold">{{ jami_foydalanuvchilar }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card metric-card">
+            <div class="card-body d-flex align-items-center gap-3 p-4">
+                <div class="metric-icon"><i class="fas fa-calendar-day"></i></div>
+                <div>
+                    <div class="text-muted small">Bugungi buyurtmalar</div>
+                    <div class="fs-3 fw-bold">{{ bugungi_buyurtma_soni }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-6">
+        <div class="card metric-card">
+            <div class="card-body d-flex align-items-center gap-3 p-4">
+                <div class="metric-icon"><i class="fas fa-money-bill-wave"></i></div>
+                <div>
+                    <div class="text-muted small">Bugungi tushum</div>
+                    <div class="fs-3 fw-bold text-success">{{ bugungi_tushum }} so'm</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card dashboard-table-card">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h5 class="fw-bold mb-0">Kam qolgan mahsulotlar</h5>
+            </div>
+            <div class="card-body px-4 pb-4">
+                {% if kam_qolgan_mahsulotlar %}
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Mahsulot</th>
+                                    <th>Kategoriya</th>
+                                    <th>Holat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for mahsulot in kam_qolgan_mahsulotlar %}
+                                <tr>
+                                    <td class="fw-semibold">{{ mahsulot.nomi }}</td>
+                                    <td>
+                                        {% if mahsulot.kategoriya %}
+                                            {{ mahsulot.kategoriya.nomi }}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="low-stock-badge">
+                                            {{ mahsulot.mavjud_soni }} ta qoldi
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">Kam qolgan mahsulotlar yo‘q.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card dashboard-table-card">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h5 class="fw-bold mb-0">Eng ko‘p sotilgan mahsulotlar</h5>
+            </div>
+            <div class="card-body px-4 pb-4">
+                {% if eng_kop_sotilganlar %}
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Mahsulot</th>
+                                    <th>Sotilgan</th>
+                                    <th>Tushum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in eng_kop_sotilganlar %}
+                                <tr>
+                                    <td class="fw-semibold">{{ item.mahsulot__nomi }}</td>
+                                    <td><span class="good-badge">{{ item.jami_sotilgan }} ta</span></td>
+                                    <td class="text-success fw-bold">{{ item.jami_tushum }} so'm</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">Sotuv ma'lumotlari hali yo‘q.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card dashboard-table-card">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h5 class="fw-bold mb-0">Oxirgi buyurtmalar</h5>
+            </div>
+            <div class="card-body px-4 pb-4">
+                {% if oxirgi_buyurtmalar %}
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Foydalanuvchi</th>
+                                    <th>Telefon</th>
+                                    <th>Summa</th>
+                                    <th>Holat</th>
+                                    <th>Sana</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for buyurtma in oxirgi_buyurtmalar %}
+                                <tr>
+                                    <td>#{{ buyurtma.id }}</td>
+                                    <td class="fw-semibold">{{ buyurtma.foydalanuvchi.username }}</td>
+                                    <td>{{ buyurtma.tel_raqam }}</td>
+                                    <td class="text-success fw-bold">{{ buyurtma.jami_summa }} so'm</td>
+                                    <td>{{ buyurtma.holati }}</td>
+                                    <td>{{ buyurtma.sana|date:"d.m.Y H:i" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">Buyurtmalar hali yo‘q.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{{ chart_labels|json_script:"chart-labels" }}
+{{ chart_orders|json_script:"chart-orders" }}
+{{ chart_revenue|json_script:"chart-revenue" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const labels = JSON.parse(document.getElementById('chart-labels').textContent);
+    const ordersData = JSON.parse(document.getElementById('chart-orders').textContent);
+    const revenueData = JSON.parse(document.getElementById('chart-revenue').textContent);
+
+    const ordersCtx = document.getElementById('ordersChart').getContext('2d');
+    new Chart(ordersCtx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Buyurtmalar soni',
+                data: ordersData,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    precision: 0
+                }
+            }
+        }
+    });
+
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Tushum',
+                data: revenueData,
+                tension: 0.3,
+                fill: false,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>

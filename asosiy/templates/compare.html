@@ -1,0 +1,418 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ dori.nomi }} | SHIFO-NUR{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-card,
+    .review-card,
+    .similar-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.07);
+        overflow: hidden;
+    }
+
+    .product-image-box {
+        background: #fff;
+        min-height: 430px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 28px;
+    }
+
+    .product-image-box img {
+        max-width: 100%;
+        max-height: 360px;
+        object-fit: contain;
+    }
+
+    .product-category-badge {
+        background: rgba(25, 135, 84, 0.12);
+        color: #198754;
+        font-weight: 600;
+        padding: 8px 14px;
+        border-radius: 999px;
+        display: inline-block;
+        margin-bottom: 12px;
+    }
+
+    .rating-box {
+        color: #f59e0b;
+        font-weight: 600;
+        margin-bottom: 14px;
+    }
+
+    .product-price {
+        color: #198754;
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 14px;
+    }
+
+    .stock-box {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-weight: 600;
+        margin-bottom: 18px;
+    }
+
+    .stock-available {
+        background: rgba(25, 135, 84, 0.12);
+        color: #198754;
+    }
+
+    .stock-unavailable {
+        background: rgba(220, 53, 69, 0.12);
+        color: #dc3545;
+    }
+
+    .stock-low {
+        background: rgba(255, 193, 7, 0.18);
+        color: #8a6d00;
+    }
+
+    .detail-actions .btn {
+        border-radius: 14px;
+        padding: 13px 16px;
+        font-weight: 600;
+    }
+
+    .info-box {
+        background: #f8f9fa;
+        border-radius: 16px;
+        padding: 14px 16px;
+    }
+
+    .review-form-card {
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 8px 22px rgba(0,0,0,0.06);
+    }
+
+    .review-user {
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .review-stars {
+        color: #f59e0b;
+        font-size: 0.95rem;
+    }
+
+    .similar-card {
+        transition: 0.25s ease;
+        height: 100%;
+    }
+
+    .similar-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 30px rgba(0,0,0,0.10);
+    }
+
+    .similar-image-wrap {
+        height: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        background: #fff;
+    }
+
+    .similar-image-wrap img {
+        max-height: 140px;
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    .wishlist-detail-btn {
+        border-radius: 14px;
+        font-weight: 600;
+    }
+
+    .section-title {
+        font-weight: 800;
+        color: #1f2937;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="card detail-card mb-5">
+    <div class="row g-0">
+        <div class="col-lg-5">
+            <div class="product-image-box">
+                {% if dori.rasm %}
+                    <img src="{{ dori.rasm.url }}" alt="{{ dori.nomi }}">
+                {% else %}
+                    <div class="text-center text-muted">
+                        <i class="fas fa-image fa-4x mb-3"></i>
+                        <div>Rasm mavjud emas</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card-body p-4 p-md-5">
+                {% if dori.kategoriya %}
+                    <span class="product-category-badge">
+                        <i class="fas fa-tag me-1"></i> {{ dori.kategoriya.nomi }}
+                    </span>
+                {% endif %}
+
+                <div class="rating-box">
+                    <i class="fas fa-star me-1"></i>
+                    {{ ortacha_baho }} / 5
+                    <span class="text-muted fw-normal">({{ izohlar_soni }} ta fikr)</span>
+                </div>
+
+                <h1 class="fw-bold mb-3">{{ dori.nomi }}</h1>
+
+                <div class="product-price">
+                    {{ dori.narxi }} so'm
+                </div>
+
+                {% if dori.mavjud_soni > 0 %}
+                    {% if dori.mavjud_soni <= 5 %}
+                        <div class="stock-box stock-low">
+                            <i class="fas fa-fire"></i>
+                            Kam qoldi: {{ dori.mavjud_soni }} dona
+                        </div>
+                    {% else %}
+                        <div class="stock-box stock-available">
+                            <i class="fas fa-check-circle"></i>
+                            Sotuvda {{ dori.mavjud_soni }} dona bor
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="stock-box stock-unavailable">
+                        <i class="fas fa-times-circle"></i>
+                        Hozircha sotuvda mavjud emas
+                    </div>
+                {% endif %}
+
+                <div class="info-box mb-4">
+                    <p class="text-muted mb-0">
+                        {% if dori.tavsif %}
+                            {{ dori.tavsif }}
+                        {% else %}
+                            Ushbu mahsulot uchun batafsil tavsif hali kiritilmagan.
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="row g-3 detail-actions">
+                    <div class="col-md-6">
+                        {% if dori.mavjud_soni > 0 %}
+                            <a href="{% url 'add_cart' dori.id %}" class="btn btn-success w-100">
+                                <i class="fas fa-cart-plus me-2"></i> Savatchaga qo'shish
+                            </a>
+                        {% else %}
+                            <button class="btn btn-secondary w-100" disabled>
+                                <i class="fas fa-ban me-2"></i> Vaqtinchalik yo'q
+                            </button>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <a href="{% url 'toggle_wishlist' dori.id %}"
+                           class="btn {% if saralanganmi %}btn-danger{% else %}btn-outline-danger{% endif %} w-100 wishlist-detail-btn">
+                            <i class="{% if saralanganmi %}fas{% else %}far{% endif %} fa-heart me-2"></i>
+                            {% if saralanganmi %}Saralanganlarda{% else %}Saralanganlarga qo'shish{% endif %}
+                        </a>
+                    </div>
+
+                    <div class="col-md-6">
+                        <a href="{% url 'add_to_compare' dori.id %}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-scale-balanced me-2"></i> Solishtirishga qo'shish
+                        </a>
+                    </div>
+
+                    <div class="col-md-6">
+                        <a href="{% url 'compare_products' %}" class="btn btn-outline-dark w-100">
+                            <i class="fas fa-table-columns me-2"></i> Solishtirish sahifasi
+                        </a>
+                    </div>
+
+                    <div class="col-12">
+                        <a href="{% url 'home' %}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-arrow-left me-2"></i> Ortga qaytish
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-lg-8">
+
+        <h3 class="section-title mb-4">Foydalanuvchilar fikri</h3>
+
+        {% if user.is_authenticated %}
+            <div class="card review-form-card mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">Fikr qoldirish</h5>
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Bahoyingiz</label>
+                            <select name="baho" class="form-select" style="max-width: 260px;">
+                                <option value="5">⭐⭐⭐⭐⭐ - A'lo</option>
+                                <option value="4">⭐⭐⭐⭐ - Yaxshi</option>
+                                <option value="3">⭐⭐⭐ - O'rtacha</option>
+                                <option value="2">⭐⭐ - Yomon</option>
+                                <option value="1">⭐ - Juda yomon</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Izohingiz</label>
+                            <textarea name="izoh_matni"
+                                      class="form-control"
+                                      rows="4"
+                                      placeholder="Mahsulot haqida fikringizni yozing..."
+                                      required></textarea>
+                        </div>
+
+                        <button class="btn btn-success px-4">
+                            <i class="fas fa-paper-plane me-2"></i> Yuborish
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-warning rounded-4 shadow-sm">
+                Fikr qoldirish uchun <a href="{% url 'login' %}" class="fw-semibold">tizimga kiring</a>.
+            </div>
+        {% endif %}
+
+        {% for izoh in izohlar %}
+            <div class="card review-card mb-3">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                        <div>
+                            <div class="review-user">
+                                <i class="fas fa-user-circle me-2 text-success"></i>{{ izoh.foydalanuvchi.username }}
+                            </div>
+                            <div class="review-stars mt-1">
+                                {% if izoh.baho == 5 %}⭐⭐⭐⭐⭐{% elif izoh.baho == 4 %}⭐⭐⭐⭐{% elif izoh.baho == 3 %}⭐⭐⭐{% elif izoh.baho == 2 %}⭐⭐{% else %}⭐{% endif %}
+                            </div>
+                        </div>
+                        <small class="text-muted">{{ izoh.sana|date:"d.m.Y H:i" }}</small>
+                    </div>
+
+                    <p class="mb-0 mt-3 text-muted">
+                        {{ izoh.matn }}
+                    </p>
+                </div>
+            </div>
+        {% empty %}
+            <div class="card review-card">
+                <div class="card-body p-4 text-center text-muted">
+                    <i class="fas fa-comments fa-2x mb-3"></i>
+                    <p class="mb-0">Hozircha hech kim fikr bildirmagan. Birinchi bo'ling.</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card review-card">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-3">Qisqacha ma'lumot</h5>
+
+                <div class="d-flex justify-content-between border-bottom py-2">
+                    <span class="text-muted">Mahsulot nomi</span>
+                    <span class="fw-semibold text-end">{{ dori.nomi }}</span>
+                </div>
+
+                <div class="d-flex justify-content-between border-bottom py-2">
+                    <span class="text-muted">Kategoriya</span>
+                    <span class="fw-semibold text-end">
+                        {% if dori.kategoriya %}{{ dori.kategoriya.nomi }}{% else %}—{% endif %}
+                    </span>
+                </div>
+
+                <div class="d-flex justify-content-between border-bottom py-2">
+                    <span class="text-muted">Narxi</span>
+                    <span class="fw-semibold text-success">{{ dori.narxi }} so'm</span>
+                </div>
+
+                <div class="d-flex justify-content-between border-bottom py-2">
+                    <span class="text-muted">Mavjudligi</span>
+                    <span class="fw-semibold">
+                        {% if dori.mavjud_soni > 0 %}
+                            {% if dori.mavjud_soni <= 5 %}
+                                Kam qoldi
+                            {% else %}
+                                Bor
+                            {% endif %}
+                        {% else %}
+                            Yo'q
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="d-flex justify-content-between pt-2">
+                    <span class="text-muted">O'rtacha baho</span>
+                    <span class="fw-semibold">{{ ortacha_baho }}/5</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="section-title mb-1">Sizga yoqishi mumkin</h3>
+            <p class="text-muted mb-0">Shu kategoriya bo‘yicha o‘xshash mahsulotlar.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% for sim in oxshash_dorilar %}
+            <div class="col-sm-6 col-lg-3">
+                <div class="card similar-card">
+                    <div class="similar-image-wrap">
+                        {% if sim.rasm %}
+                            <img src="{{ sim.rasm.url }}" alt="{{ sim.nomi }}">
+                        {% else %}
+                            <div class="text-center text-muted">
+                                <i class="fas fa-image fa-2x"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-body text-center d-flex flex-column">
+                        <div class="small text-muted mb-1">
+                            {% if sim.kategoriya %}{{ sim.kategoriya.nomi }}{% endif %}
+                        </div>
+                        <h6 class="fw-bold mb-2">{{ sim.nomi }}</h6>
+                        <div class="text-success fw-bold fs-5 mb-3">{{ sim.narxi }} so'm</div>
+                        <a href="{% url 'product_detail' sim.id %}" class="btn btn-outline-success rounded-pill mt-auto">
+                            Ko'rish
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-light border text-muted rounded-4 text-center">
+                    O'xshash mahsulotlar hozircha mavjud emas.
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

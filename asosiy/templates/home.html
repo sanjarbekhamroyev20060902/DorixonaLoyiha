@@ -1,0 +1,686 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bosh sahifa | SHIFO-NUR{% endblock %}
+
+{% block extra_css %}
+<style>
+    .category-card,
+    .hero-card,
+    .product-card,
+    .trust-card,
+    .filter-card {
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+    }
+
+    .category-header {
+        background: linear-gradient(135deg, #198754, #157347);
+        color: #fff;
+        font-weight: 700;
+        padding: 16px 18px;
+    }
+
+    .category-link {
+        border: none !important;
+        border-bottom: 1px solid #f1f3f5 !important;
+        padding: 14px 16px;
+        font-weight: 500;
+        transition: 0.2s ease;
+    }
+
+    .category-link:hover {
+        background-color: #f8f9fa;
+        color: #198754;
+    }
+
+    .category-link.active-custom {
+        background-color: #198754 !important;
+        color: #fff !important;
+    }
+
+    .hero-slide {
+        min-height: 340px;
+        position: relative;
+    }
+
+    .hero-slide img {
+        height: 340px;
+        object-fit: cover;
+        filter: brightness(0.62);
+    }
+
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        padding: 36px;
+    }
+
+    .hero-content {
+        max-width: 520px;
+        color: #fff;
+    }
+
+    .hero-content h2 {
+        font-weight: 800;
+        margin-bottom: 14px;
+    }
+
+    .hero-content p {
+        font-size: 1rem;
+        margin-bottom: 20px;
+        opacity: 0.95;
+    }
+
+    .trust-card {
+        background: #fff;
+        padding: 20px;
+        height: 100%;
+        text-align: center;
+    }
+
+    .trust-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        background: rgba(25, 135, 84, 0.10);
+        color: #198754;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        margin-bottom: 14px;
+    }
+
+    .section-title {
+        font-weight: 800;
+        color: #1f2937;
+    }
+
+    .section-subtitle {
+        color: #6b7280;
+        margin-bottom: 0;
+    }
+
+    .product-card {
+        transition: 0.25s ease;
+        background: #fff;
+        height: 100%;
+        position: relative;
+    }
+
+    .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.10);
+    }
+
+    .wishlist-btn {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        z-index: 5;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.10);
+        transition: 0.2s ease;
+    }
+
+    .wishlist-btn:hover {
+        transform: scale(1.06);
+    }
+
+    .product-image-wrap {
+        height: 220px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        overflow: hidden;
+    }
+
+    .product-image {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+
+    .product-card:hover .product-image {
+        transform: scale(1.08);
+    }
+
+    .product-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        line-height: 1.4;
+        min-height: 48px;
+    }
+
+    .product-title a {
+        text-decoration: none;
+        color: #1f2937;
+    }
+
+    .product-title a:hover {
+        color: #198754;
+    }
+
+    .product-category {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+
+    .product-price {
+        color: #198754;
+        font-weight: 800;
+        font-size: 1.3rem;
+    }
+
+    .stock-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 999px;
+    }
+
+    .stock-available {
+        background: rgba(25, 135, 84, 0.12);
+        color: #198754;
+    }
+
+    .stock-unavailable {
+        background: rgba(220, 53, 69, 0.12);
+        color: #dc3545;
+    }
+
+    .stock-low {
+        background: rgba(255, 193, 7, 0.18);
+        color: #8a6d00;
+    }
+
+    .empty-box {
+        border-radius: 18px;
+        background: #fff8e1;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+    }
+
+    .filter-card {
+        background: #fff;
+        padding: 18px;
+    }
+
+    .pagination .page-link {
+        color: #198754;
+        border-radius: 10px !important;
+        margin: 0 4px;
+        border: 1px solid #dee2e6;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #198754;
+        border-color: #198754;
+        color: #fff;
+    }
+
+    .pagination .page-link:hover {
+        color: #146c43;
+        background-color: #f8f9fa;
+    }
+
+    @media (max-width: 991px) {
+        .hero-slide img,
+        .hero-slide {
+            height: 280px;
+            min-height: 280px;
+        }
+
+        .hero-overlay {
+            padding: 24px;
+        }
+
+        .hero-content h2 {
+            font-size: 1.6rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+    <div class="col-lg-3">
+        <div class="card category-card sticky-top" style="top: 100px;">
+            <div class="category-header">
+                <i class="fas fa-layer-group me-2"></i> Bo'limlar
+            </div>
+
+            <div class="list-group list-group-flush">
+                <a href="{% url 'home' %}"
+                   class="list-group-item list-group-item-action category-link d-flex justify-content-between align-items-center {% if not tanlangan_kategoriya %}active-custom{% endif %}">
+                    <span>Barchasi</span>
+                    <i class="fas fa-chevron-right small"></i>
+                </a>
+
+                {% for kat in kategoriyalar %}
+                    <a href="{% url 'category_filter' kat.id %}"
+                       class="list-group-item list-group-item-action category-link d-flex justify-content-between align-items-center {% if tanlangan_kategoriya and tanlangan_kategoriya.id == kat.id %}active-custom{% endif %}">
+                        <span>{{ kat.nomi }}</span>
+                        <span class="badge bg-light text-dark rounded-pill">
+                            {{ kat.mahsulotlar.count }}
+                        </span>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-9">
+
+        <div id="heroCarousel" class="carousel slide hero-card mb-4" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+            </div>
+
+            <div class="carousel-inner">
+                <div class="carousel-item active hero-slide">
+                    <img src="https://img.freepik.com/free-photo/medicine-capsules-global-health-with-geometric-pattern-digital-remix_53876-126742.jpg"
+                         class="d-block w-100"
+                         alt="Sifatli dori vositalari">
+                    <div class="hero-overlay">
+                        <div class="hero-content">
+                            <span class="badge bg-success-subtle text-success mb-3 px-3 py-2 rounded-pill">Ishonchli onlayn dorixona</span>
+                            <h2>Eng sifatli dori vositalari</h2>
+                            <p>Kerakli mahsulotlarni qulay qidiring, narxlarni ko‘ring va tez buyurtma bering.</p>
+                            <a href="#products" class="btn btn-success btn-lg rounded-pill px-4">
+                                Mahsulotlarni ko‘rish
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="carousel-item hero-slide">
+                    <img src="https://t4.ftcdn.net/jpg/02/81/42/77/360_F_281427785_gfahY8bX4VYCGo6jlfO8St38wS9cJQop.jpg"
+                         class="d-block w-100"
+                         alt="Tezkor yetkazib berish">
+                    <div class="hero-overlay">
+                        <div class="hero-content">
+                            <span class="badge bg-success-subtle text-success mb-3 px-3 py-2 rounded-pill">Qulay xizmat</span>
+                            <h2>Tezkor yetkazib berish</h2>
+                            <p>Buyurtmangizni tez ko‘rib chiqamiz va imkon qadar tez yetkazishga harakat qilamiz.</p>
+                            <a href="{% url 'cart' %}" class="btn btn-light btn-lg rounded-pill px-4 text-success fw-bold">
+                                Savatchani ko‘rish
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="carousel-item hero-slide">
+                    <img src="https://st2.depositphotos.com/3662505/6878/i/950/depositphotos_68789187-stock-photo-medical-background-with-pills-and.jpg"
+                         class="d-block w-100"
+                         alt="Hamyonbop narxlar">
+                    <div class="hero-overlay">
+                        <div class="hero-content">
+                            <span class="badge bg-success-subtle text-success mb-3 px-3 py-2 rounded-pill">Hamyonbop narxlar</span>
+                            <h2>Qulay narx va ishonchli xizmat</h2>
+                            <p>Asosiy kategoriyalar bo‘yicha dori vositalarini tartibli ko‘ring va oson tanlang.</p>
+                            <a href="{% url 'home' %}" class="btn btn-success btn-lg rounded-pill px-4">
+                                Xaridni boshlash
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="trust-card">
+                    <div class="trust-icon"><i class="fas fa-certificate"></i></div>
+                    <h6 class="fw-bold">Sifatli mahsulotlar</h6>
+                    <p class="text-muted small mb-0">Saralangan va ishonchli mahsulotlar katalogi.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="trust-card">
+                    <div class="trust-icon"><i class="fas fa-truck-fast"></i></div>
+                    <h6 class="fw-bold">Qulay buyurtma</h6>
+                    <p class="text-muted small mb-0">Bir necha bosqichda tez va sodda xarid jarayoni.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="trust-card">
+                    <div class="trust-icon"><i class="fas fa-shield-heart"></i></div>
+                    <h6 class="fw-bold">Ishonchli xizmat</h6>
+                    <p class="text-muted small mb-0">Foydalanuvchi uchun qulay va tartibli tizim.</p>
+                </div>
+            </div>
+        </div>
+
+        {% if eng_kop_sotilganlar %}
+        <div class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div>
+                    <h3 class="section-title mb-1">
+                        <i class="fas fa-fire text-danger me-2"></i>Eng ko‘p sotilgan mahsulotlar
+                    </h3>
+                    <p class="section-subtitle">Foydalanuvchilar eng ko‘p tanlayotgan mahsulotlar.</p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                {% for dori in eng_kop_sotilganlar %}
+                    <div class="col-sm-6 col-xl-4">
+                        <div class="card product-card">
+
+                            <a href="{% url 'toggle_wishlist' dori.id %}"
+                               class="wishlist-btn {% if dori.id in saralangan_ids %}text-danger{% else %}text-secondary{% endif %}"
+                               title="Saralanganlarga qo'shish">
+                                <i class="{% if dori.id in saralangan_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+                            </a>
+
+                            <a href="{% url 'product_detail' dori.id %}" class="product-image-wrap">
+                                {% if dori.rasm %}
+                                    <img src="{{ dori.rasm.url }}" alt="{{ dori.nomi }}" class="product-image">
+                                {% else %}
+                                    <div class="text-center text-muted">
+                                        <i class="fas fa-image fa-3x mb-2"></i>
+                                        <div>Rasm mavjud emas</div>
+                                    </div>
+                                {% endif %}
+                            </a>
+
+                            <div class="card-body d-flex flex-column">
+                                <div class="product-category mb-1">
+                                    {% if dori.kategoriya %}
+                                        {{ dori.kategoriya.nomi }}
+                                    {% else %}
+                                        Kategoriyasiz
+                                    {% endif %}
+                                </div>
+
+                                <div class="product-title mb-2">
+                                    <a href="{% url 'product_detail' dori.id %}">
+                                        {{ dori.nomi }}
+                                    </a>
+                                </div>
+
+                                <p class="text-muted small mb-3">
+                                    {{ dori.tavsif|truncatewords:10 }}
+                                </p>
+
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div class="product-price">{{ dori.narxi }} so'm</div>
+
+                                        {% if dori.mavjud_soni > 0 %}
+                                            {% if dori.mavjud_soni <= 5 %}
+                                                <span class="stock-badge stock-low">
+                                                    <i class="fas fa-fire"></i> Kam qoldi
+                                                </span>
+                                            {% else %}
+                                                <span class="stock-badge stock-available">
+                                                    <i class="fas fa-check-circle"></i> Mavjud
+                                                </span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="stock-badge stock-unavailable">
+                                                <i class="fas fa-times-circle"></i> Qolmagan
+                                            </span>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if dori.mavjud_soni > 0 %}
+                                        <a href="{% url 'add_cart' dori.id %}" class="btn btn-success w-100 rounded-pill fw-semibold">
+                                            <i class="fas fa-cart-plus me-2"></i>Savatga qo'shish
+                                        </a>
+                                    {% else %}
+                                        <button class="btn btn-secondary w-100 rounded-pill" disabled>
+                                            <i class="fas fa-ban me-2"></i>Sotuvda yo'q
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card filter-card mb-4">
+            <form method="get" class="row g-3 align-items-end">
+                {% if qidiruv %}
+                    <input type="hidden" name="q" value="{{ qidiruv }}">
+                {% endif %}
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Minimal narx</label>
+                    <input type="number"
+                           name="min_price"
+                           value="{{ min_price }}"
+                           class="form-control"
+                           placeholder="Masalan: 10000">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Maksimal narx</label>
+                    <input type="number"
+                           name="max_price"
+                           value="{{ max_price }}"
+                           class="form-control"
+                           placeholder="Masalan: 100000">
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Saralash</label>
+                    <select name="sort" class="form-select">
+                        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Eng yangi</option>
+                        <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Narxi arzonidan</option>
+                        <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Narxi qimmatidan</option>
+                        <option value="name" {% if sort == 'name' %}selected{% endif %}>Nomi bo‘yicha</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-filter me-2"></i>Filter
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-3">
+                <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm rounded-pill">
+                    Tozalash
+                </a>
+            </div>
+        </div>
+
+        <div id="products" class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+            <div>
+                <h3 class="section-title mb-1">
+                    {% if qidiruv %}
+                        Qidiruv natijasi: "{{ qidiruv }}"
+                    {% elif tanlangan_kategoriya %}
+                        {{ tanlangan_kategoriya.nomi }} bo‘limi
+                    {% else %}
+                        So‘nggi mahsulotlar
+                    {% endif %}
+                </h3>
+                <p class="section-subtitle">
+                    Sizga kerakli mahsulotlarni qulay tarzda ko‘rib chiqing.
+                </p>
+            </div>
+
+            <div class="text-muted small">
+                Jami: <strong>{{ page_obj.paginator.count }}</strong> ta mahsulot
+            </div>
+        </div>
+
+        <div class="row g-4">
+            {% for dori in dorilar %}
+                <div class="col-sm-6 col-xl-4">
+                    <div class="card product-card">
+
+                        <a href="{% url 'toggle_wishlist' dori.id %}"
+                           class="wishlist-btn {% if dori.id in saralangan_ids %}text-danger{% else %}text-secondary{% endif %}"
+                           title="Saralanganlarga qo'shish">
+                            <i class="{% if dori.id in saralangan_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+                        </a>
+
+                        <a href="{% url 'product_detail' dori.id %}" class="product-image-wrap">
+                            {% if dori.rasm %}
+                                <img src="{{ dori.rasm.url }}" alt="{{ dori.nomi }}" class="product-image">
+                            {% else %}
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-image fa-3x mb-2"></i>
+                                    <div>Rasm mavjud emas</div>
+                                </div>
+                            {% endif %}
+                        </a>
+
+                        <div class="card-body d-flex flex-column">
+                            <div class="product-category mb-1">
+                                {% if dori.kategoriya %}
+                                    {{ dori.kategoriya.nomi }}
+                                {% else %}
+                                    Kategoriyasiz
+                                {% endif %}
+                            </div>
+
+                            <div class="product-title mb-2">
+                                <a href="{% url 'product_detail' dori.id %}">
+                                    {{ dori.nomi }}
+                                </a>
+                            </div>
+
+                            <p class="text-muted small mb-3">
+                                {{ dori.tavsif|truncatewords:10 }}
+                            </p>
+
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="product-price">{{ dori.narxi }} so'm</div>
+
+                                    {% if dori.mavjud_soni > 0 %}
+                                        {% if dori.mavjud_soni <= 5 %}
+                                            <span class="stock-badge stock-low">
+                                                <i class="fas fa-fire"></i> Kam qoldi
+                                            </span>
+                                        {% else %}
+                                            <span class="stock-badge stock-available">
+                                                <i class="fas fa-check-circle"></i> Mavjud
+                                            </span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="stock-badge stock-unavailable">
+                                            <i class="fas fa-times-circle"></i> Qolmagan
+                                        </span>
+                                    {% endif %}
+                                </div>
+
+                                {% if dori.mavjud_soni > 0 %}
+                                    <a href="{% url 'add_cart' dori.id %}" class="btn btn-success w-100 rounded-pill fw-semibold">
+                                        <i class="fas fa-cart-plus me-2"></i>Savatga qo'shish
+                                    </a>
+                                {% else %}
+                                    <button class="btn btn-secondary w-100 rounded-pill" disabled>
+                                        <i class="fas fa-ban me-2"></i>Sotuvda yo'q
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="empty-box p-5 text-center">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h4 class="fw-bold">Mahsulot topilmadi</h4>
+                        <p class="text-muted mb-3">
+                            Boshqa kategoriya tanlab ko‘ring yoki qidiruv so‘zini o‘zgartiring.
+                        </p>
+                        <a href="{% url 'home' %}" class="btn btn-outline-dark rounded-pill px-4">
+                            Barchasini ko‘rish
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if page_obj.has_other_pages %}
+        <div class="d-flex justify-content-center mt-5">
+            <nav aria-label="Mahsulotlar navigatsiyasi">
+                <ul class="pagination flex-wrap">
+
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="?{% if qidiruv %}q={{ qidiruv|urlencode }}&{% endif %}{% if min_price %}min_price={{ min_price }}&{% endif %}{% if max_price %}max_price={{ max_price }}&{% endif %}{% if sort %}sort={{ sort }}&{% endif %}page={{ page_obj.previous_page_number }}">
+                                Oldingi
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Oldingi</span>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="?{% if qidiruv %}q={{ qidiruv|urlencode }}&{% endif %}{% if min_price %}min_price={{ min_price }}&{% endif %}{% if max_price %}max_price={{ max_price }}&{% endif %}{% if sort %}sort={{ sort }}&{% endif %}page={{ num }}">
+                                    {{ num }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="?{% if qidiruv %}q={{ qidiruv|urlencode }}&{% endif %}{% if min_price %}min_price={{ min_price }}&{% endif %}{% if max_price %}max_price={{ max_price }}&{% endif %}{% if sort %}sort={{ sort }}&{% endif %}page={{ page_obj.next_page_number }}">
+                                Keyingi
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Keyingi</span>
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

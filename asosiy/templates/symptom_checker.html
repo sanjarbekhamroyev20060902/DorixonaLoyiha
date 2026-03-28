@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}Simptom Navigator | SHIFO-NUR{% endblock %}
+
+{% block extra_css %}
+<style>
+    .symptom-card,
+    .result-card,
+    .product-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.07);
+        overflow: hidden;
+        background: #fff;
+    }
+
+    .section-title {
+        font-weight: 800;
+        color: #1f2937;
+    }
+
+    .section-subtitle {
+        color: #6b7280;
+    }
+
+    .hero-box {
+        background: linear-gradient(135deg, #198754, #157347);
+        color: white;
+        border-radius: 20px;
+        padding: 32px;
+        margin-bottom: 24px;
+        box-shadow: 0 12px 30px rgba(25, 135, 84, 0.22);
+    }
+
+    .hero-box h2 {
+        font-weight: 800;
+    }
+
+    .note-box {
+        background: rgba(255, 193, 7, 0.14);
+        color: #6b5500;
+        border-radius: 16px;
+        padding: 14px 16px;
+        font-weight: 500;
+    }
+
+    .product-image-wrap {
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        background: #fff;
+    }
+
+    .product-image-wrap img {
+        max-height: 150px;
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    .product-card {
+        height: 100%;
+        transition: 0.25s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 30px rgba(0,0,0,0.10);
+    }
+
+    .category-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(25, 135, 84, 0.10);
+        color: #198754;
+        font-weight: 600;
+        margin: 4px 6px 4px 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-box">
+    <h2 class="mb-2">
+        <i class="fas fa-stethoscope me-2"></i>Simptom Navigator
+    </h2>
+    <p class="mb-0">
+        Simptomlaringizni yozing, tizim sizni mos kategoriya va mahsulotlarga yo‘naltiradi.
+    </p>
+</div>
+
+<div class="card symptom-card mb-4">
+    <div class="card-body p-4">
+        <h3 class="section-title mb-2">Simptomlarni kiriting</h3>
+        <p class="section-subtitle mb-3">
+            Masalan: “yo‘tal, isitma, tomoq og‘riq”, “bosh og‘riq”, “oshqozon bezovta”.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <textarea name="symptoms"
+                          class="form-control"
+                          rows="5"
+                          placeholder="Simptomlaringizni shu yerga yozing...">{{ symptom_text }}</textarea>
+            </div>
+            <button type="submit" class="btn btn-success px-4 py-2 rounded-pill fw-semibold">
+                <i class="fas fa-magnifying-glass me-2"></i>Tahlil qilish
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="note-box mb-4">
+    <i class="fas fa-circle-info me-2"></i>
+    Bu sahifa tashxis qo‘ymaydi. Faqat mahsulot va kategoriya bo‘yicha yo‘naltiradi. Kuchli yoki davomli simptomlarda shifokorga murojaat qiling.
+</div>
+
+{% if result %}
+    <div class="card result-card mb-4">
+        <div class="card-body p-4">
+            <h3 class="section-title mb-2">{{ result.title }}</h3>
+            <p class="text-muted mb-3">{{ result.advice }}</p>
+
+            {% if matched_categories %}
+                <div class="mb-2">
+                    {% for category in matched_categories %}
+                        <a href="{% url 'category_filter' category.id %}" class="text-decoration-none">
+                            <span class="category-chip">
+                                <i class="fas fa-tag"></i> {{ category.nomi }}
+                            </span>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+
+{% if recommended_products %}
+    <div class="mb-4">
+        <h3 class="section-title mb-3">Mos mahsulotlar</h3>
+
+        <div class="row g-4">
+            {% for dori in recommended_products %}
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card product-card">
+                        <div class="product-image-wrap">
+                            {% if dori.rasm %}
+                                <img src="{{ dori.rasm.url }}" alt="{{ dori.nomi }}">
+                            {% else %}
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-image fa-2x"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-body d-flex flex-column">
+                            <div class="small text-muted mb-1">
+                                {% if dori.kategoriya %}{{ dori.kategoriya.nomi }}{% endif %}
+                            </div>
+
+                            <h6 class="fw-bold mb-2">{{ dori.nomi }}</h6>
+                            <div class="text-success fw-bold mb-3">{{ dori.narxi }} so'm</div>
+
+                            <div class="d-grid gap-2 mt-auto">
+                                <a href="{% url 'product_detail' dori.id %}" class="btn btn-outline-primary rounded-pill">
+                                    Ko‘rish
+                                </a>
+
+                                {% if dori.mavjud_soni > 0 %}
+                                    <a href="{% url 'add_cart' dori.id %}" class="btn btn-success rounded-pill">
+                                        Savatchaga qo‘shish
+                                    </a>
+                                {% else %}
+                                    <button class="btn btn-secondary rounded-pill" disabled>
+                                        Mavjud emas
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% elif symptom_text %}
+    <div class="card result-card">
+        <div class="card-body p-4 text-center text-muted">
+            <i class="fas fa-search fa-2x mb-3"></i>
+            <p class="mb-0">Mos mahsulotlar topilmadi. Iltimos, simptomlarni aniqroq yozing.</p>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
+{% if ai_response %}
+
+<div class="card mb-4">
+<div class="card-body">
+
+<h4 class="fw-bold mb-3">
+<i class="fas fa-robot me-2 text-success"></i>
+AI tavsiyasi
+</h4>
+
+<p class="text-muted">
+{{ ai_response }}
+</p>
+
+</div>
+</div>
+
+{% endif %}
