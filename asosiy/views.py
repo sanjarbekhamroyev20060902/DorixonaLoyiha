@@ -684,3 +684,12 @@ def admin_dashboard(request):
         "chart_revenue": revenue_data,
     }
     return render(request, "admin_dashboard.html", context)
+from django.http import HttpResponse
+from django.contrib.auth import get_user_model
+
+def create_admin(request):
+    User = get_user_model()
+    if not User.objects.filter(username="admin").exists():
+        User.objects.create_superuser("admin", "admin@gmail.com", "12345678")
+        return HttpResponse("Admin yaratildi")
+    return HttpResponse("Admin bor")

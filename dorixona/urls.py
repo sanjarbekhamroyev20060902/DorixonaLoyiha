@@ -3,11 +3,12 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
-
+from asosiy.views import create_admin
 from asosiy import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('create-admin/', create_admin),
     path('dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('symptom-checker/', views.symptom_checker, name='symptom_checker'),
     # Asosiy sahifalar
