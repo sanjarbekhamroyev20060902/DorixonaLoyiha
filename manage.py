@@ -20,7 +20,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-gunicorn
-whitenoise
-dj-database-url
-psycopg2-binary
